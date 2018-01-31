@@ -18,6 +18,10 @@ app.engine('hbs', hbs({
 }));
 app.set('view engine','hbs')
 
+// MID
+app.use('/css',express.static(__dirname + './../public/css'));
+app.use('/js',express.static(__dirname + './../public/js'));
+
 // GET
 app.get('/',(req,res)=>{
     res.render('home.hbs');
