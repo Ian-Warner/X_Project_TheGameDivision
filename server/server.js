@@ -42,7 +42,12 @@ app.get('/register',(req,res)=>{
 
 // POST
 app.post('/api/register',(req,res)=>{
-    console.log(req.body);
+    
+    const user = new User(req.body)
+
+    user.save((err,doc)=>{
+        if(err) res.status(400).send(err);
+    })
 });
 
 app.listen(config.PORT,()=>{
