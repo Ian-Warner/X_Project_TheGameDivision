@@ -18,22 +18,32 @@ app.engine('hbs', hbs({
 }));
 app.set('view engine','hbs')
 
-//DATABASE
+// DATABASE
 mongoose.Promise = global.Promise;
 mongoose.connect(config.DATABASE);
 
-//MODELS
+// MODELS
 const {User} = require('./models/user');
 
 // MID
 app.use('/css',express.static(__dirname + './../public/css'));
 app.use('/js',express.static(__dirname + './../public/js'));
 
+app.use(bodyParser.json());
+app.use(cookieParser());
+
 // GET
 app.get('/',(req,res)=>{
-    res.render('home.hbs');
+    res.render('home');
+});
+app.get('/register',(req,res)=>{
+    res.render('register');
 });
 
+// POST
+app.post('/api/register',(req,res)=>{
+    console.log(req.body);
+});
 
 app.listen(config.PORT,()=>{
     console.log(`Started at port ${config.PORT}`)
