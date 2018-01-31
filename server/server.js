@@ -50,7 +50,7 @@ app.post('/api/register',(req,res)=>{
     const user = new User(req.body)
 
     user.save((err,doc)=>{
-        if(err) res.status(400).send(err);
+        if(err) return res.status(400).send(err);
         user.generateToken((err,user)=>{
             if(err) res.status(400).send(err);
             res.cookie('auth',user.token).send('ok');
@@ -58,7 +58,18 @@ app.post('/api/register',(req,res)=>{
     })
 });
 app.post('/api/login',(req,res)=>{
-    console.log(req.body);
+    User.findOne({'email':req.body.email},(err,user)=>{
+        if(!user) return res.status(400).json({message:'Auth failed, wrong email.'});
+        user.comparePassword(req.body.password, function(err, isMatch){
+            if(err) throw err;
+            if(!isMatch) return res.status(400).json({message:'Auth failed, wrong password.'})
+
+            user.generateToken((err,user)=>{
+                if(err) return res.status(400).send(err);
+                res.cookie('auth',user.token).send('ok');
+            })
+        })
+    })
 });
 
 app.listen(config.PORT,()=>{
