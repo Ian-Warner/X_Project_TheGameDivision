@@ -18,6 +18,13 @@ app.engine('hbs', hbs({
 }));
 app.set('view engine','hbs')
 
+//DATABASE
+mongoose.Promise = global.Promise();
+mongoose.connect(config.DATABASE);
+
+//MODELS
+const {User} = require('./models/user');
+
 // MID
 app.use('/css',express.static(__dirname + './../public/css'));
 app.use('/js',express.static(__dirname + './../public/js'));
