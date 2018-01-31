@@ -19,7 +19,7 @@ app.engine('hbs', hbs({
 app.set('view engine','hbs')
 
 //DATABASE
-mongoose.Promise = global.Promise();
+mongoose.Promise = global.Promise;
 mongoose.connect(config.DATABASE);
 
 //MODELS
