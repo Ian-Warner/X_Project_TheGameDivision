@@ -40,6 +40,10 @@ app.get('/register',(req,res)=>{
     res.render('register');
 });
 
+app.get('/login',(req,res)=>{
+    res.render('login');
+})
+
 // POST
 app.post('/api/register',(req,res)=>{
     
@@ -52,6 +56,9 @@ app.post('/api/register',(req,res)=>{
             res.cookie('auth',user.token).send('ok');
         })
     })
+});
+app.post('/api/login',(req,res)=>{
+    console.log(req.body);
 });
 
 app.listen(config.PORT,()=>{
