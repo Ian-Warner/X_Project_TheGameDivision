@@ -71,6 +71,18 @@ userSchema.methods.generateToken = function(cb){
     })
 }
 
+userSchema.statics.findByToken = function(token,cb){
+    var user = this;
+
+    jwt.verify(token,config.SECRET,(err, decode)=>{
+        user.findOne({'_id':decode,'token':token},(err, user)=>{
+            if(err) return cb(err);
+            cb(null,user)
+        })
+    })
+
+}
+
 userSchema.methods.comparePassword = function(candidatePassword, cb){
 
     bcrypt.compare(candidatePassword, this.password, function(err,isMatch){

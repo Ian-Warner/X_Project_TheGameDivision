@@ -29,6 +29,7 @@ const {User} = require('./models/user');
 app.use('/css',express.static(__dirname + './../public/css'));
 app.use('/js',express.static(__dirname + './../public/js'));
 
+const {auth} = require('./middleware/auth');
 app.use(bodyParser.json());
 app.use(cookieParser());
 
@@ -40,7 +41,8 @@ app.get('/register',(req,res)=>{
     res.render('register');
 });
 
-app.get('/login',(req,res)=>{
+app.get('/login',auth,(req,res)=>{
+    if(req.user) return res.redirect('/dashboard');
     res.render('login');
 })
 
@@ -59,18 +61,19 @@ app.post('/api/register',(req,res)=>{
 });
 app.post('/api/login',(req,res)=>{
     User.findOne({'email':req.body.email},(err,user)=>{
-        if(!user) return res.status(400).json({message:'Auth failed, wrong email.'});
+        if(!user) return res.status(400).json({message:'Auth failed, wrong email'})
+   
         user.comparePassword(req.body.password, function(err, isMatch){
             if(err) throw err;
-            if(!isMatch) return res.status(400).json({message:'Auth failed, wrong password.'})
+            if(!isMatch) return res.status(400).json({message:'Auth failed, wrong password'});
 
-            user.generateToken((err,user)=>{
+            user.generateToken((er,user)=>{
                 if(err) return res.status(400).send(err);
                 res.cookie('auth',user.token).send('ok');
             })
         })
     })
-});
+})
 
 app.listen(config.PORT,()=>{
     console.log(`Started at port ${config.PORT}`)
