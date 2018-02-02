@@ -55,6 +55,14 @@ app.get('/dashboard',auth,(req,res)=>{
     })
 })
 
+app.get('/dashboard/articles',auth,(req,res)=>{
+    if(!req.user) return res.redirect('/login');
+    res.render('admin_articles',{
+        dashboard:true,
+        isAdmin: req.user.role === 1 ? true : false
+    })
+})
+
 // POST
 app.post('/api/register',(req,res)=>{
     
