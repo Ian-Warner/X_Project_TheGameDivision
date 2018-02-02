@@ -37,13 +37,22 @@ app.use(cookieParser());
 app.get('/',(req,res)=>{
     res.render('home');
 });
-app.get('/register',(req,res)=>{
+app.get('/register',auth,(req,res)=>{
+    if(req.user) return res.redirect('/dashboard');
     res.render('register');
 });
 
 app.get('/login',auth,(req,res)=>{
     if(req.user) return res.redirect('/dashboard');
     res.render('login');
+})
+
+app.get('/dashboard',auth,(req,res)=>{
+    if(!req.user) return res.redirect('/login');
+    res.render('dashboard',{
+        dashboard:true,
+        isAdmin: req.user.role === 1 ? true : false
+    })
 })
 
 // POST
@@ -54,7 +63,7 @@ app.post('/api/register',(req,res)=>{
     user.save((err,doc)=>{
         if(err) return res.status(400).send(err);
         user.generateToken((err,user)=>{
-            if(err) res.status(400).send(err);
+            if(err) return res.status(400).send(err);
             res.cookie('auth',user.token).send('ok');
         })
     })
