@@ -36,8 +36,15 @@ app.use(cookieParser());
 
 // GET
 app.get('/',(req,res)=>{
-    res.render('home');
-});
+
+    Article.find().sort({_id:'asc'}).limit(10).exec((err,doc)=>{
+        if(err) return res.status(400).send(err);
+        res.render('home',{
+            articles:doc
+        })
+    })
+})
+
 app.get('/register',auth,(req,res)=>{
     if(req.user) return res.redirect('/dashboard');
     res.render('register');
@@ -46,6 +53,22 @@ app.get('/register',auth,(req,res)=>{
 app.get('/login',auth,(req,res)=>{
     if(req.user) return res.redirect('/dashboard');
     res.render('login');
+})
+
+app.get('/games/:id',auth,(req,res)=>{
+
+    let addReview = req.user ? true : false;
+
+    Article.findById(req.params.id,(err,article)=>{
+        if(err) res.status(400).send(err);
+
+        res.render('article',{
+            date:moment(article.createdAt).format('MM/DD/YY'),
+            article,
+            review:addReview,
+        })
+    })
+
 })
 
 app.get('/dashboard',auth,(req,res)=>{
