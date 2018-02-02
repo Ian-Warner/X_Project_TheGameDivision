@@ -92,6 +92,10 @@ app.post('/api/login',(req,res)=>{
     })
 })
 
+app.post('/api/add_article',auth,(req,res)=>{
+        console.log(req.body)
+})
+
 app.listen(config.PORT,()=>{
     console.log(`Started at port ${config.PORT}`)
 })

@@ -49,4 +49,26 @@
         }
     });
 
+        function postData(){
+
+            const article = {
+                title:$('#title').val(),
+                review:$('#review').val(),
+                rating:$('#rating').val()
+            }
+
+            $.ajax({
+                type:'POST',
+                url:'/api/add_article',
+                data:JSON.stringify(article),
+                contentType:'application/json',
+                success:(data)=>{
+                    alert('good')
+                },
+                err:()=>{
+                    alert('Big problem')
+                }
+            })
+        }
+
 </script>
