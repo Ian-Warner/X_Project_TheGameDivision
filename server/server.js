@@ -25,6 +25,7 @@ mongoose.connect(config.DATABASE);
 // MODELS
 const {User} = require('./models/user');
 const {Article} = require('./models/article');
+const {UserReview} = require('./models/user_reviews');
 
 // MID
 app.use('/css',express.static(__dirname + './../public/css'));
@@ -62,11 +63,16 @@ app.get('/games/:id',auth,(req,res)=>{
     Article.findById(req.params.id,(err,article)=>{
         if(err) res.status(400).send(err);
 
-        res.render('article',{
+        UserReview.find({'postId':req.params.id}).exec((err,userReviews)=>{
+            res.render('article',{
             date:moment(article.createdAt).format('MM/DD/YY'),
             article,
             review:addReview,
+            userReviews
+            })
         })
+        
+        
     })
 
 })
@@ -85,6 +91,27 @@ app.get('/dashboard/articles',auth,(req,res)=>{
         dashboard:true,
         isAdmin: req.user.role === 1 ? true : false
     })
+})
+
+app.get('/dashboard/reviews', auth, (req,res)=>{
+    if(!req.user) return res.redirect('/login');
+    UserReview.find({'ownerId':req.user._id}).exec((err,userReviews)=>{
+    
+        res.render('admin_reviews',{
+            dashboard:true,
+            isAdmin: req.user.role === 1 ? true : false,
+            userReviews
+        })
+    })
+})
+
+app.get('/dashboard/logout',auth,(req, res)=>{
+
+    req.user.deleteToken(req.token,(err,user)=>{
+        if(err) return res.status(400).send(err);
+        res.redirect('/')
+    })
+
 })
 
 // POST
@@ -128,6 +155,24 @@ app.post('/api/add_article',auth,(req,res)=>{
 
     article.save((err,doc)=>{
         if(err) res.status(400).send(err);
+        res.status(200).send();
+    })
+
+})
+
+app.post('/api/user_review',auth, (req,res)=>{
+
+    const userReview = new UserReview({
+        postId:req.body.id,
+        ownerUsername: req.user.username,
+        ownerId:req.user._id,
+        titlePost:req.body.titlePost,
+        review:req.body.review,
+        rating:req.body.rating
+    });
+
+    userReview.save((err,doc)=>{
+        if(err) return res.status.send(err);
         res.status(200).send();
     })
 
